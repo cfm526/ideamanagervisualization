@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>    
+    <script type="text/javascript" src="lib/d3.js"></script>
+    <script type="text/javascript" src="lib/d3.time.js"></script>
+    <script type="text/javascript" src="lib/d3.csv.js"></script>
+</head>
+  <body>
+    <ul id="step-Created-On"></ul>
+    <script type="text/javascript">
+
+var format = d3.time.format("%m/%d"),
+    t0 = new Date(2010, 0, 1),
+    t1 = new Date(2010, 0, Math.floor(Math.random() * 21) + 10),
+    delay = 3000;
+
+var w = 960,
+    h = 500,
+    x0 = d3.scale.linear().domain([t0, t1]).range([0, w]),
+    x1 = d3.scale.linear().domain([t0, t1]).range([0, w]);
+
+var svg = d3.select("body").append("svg:svg")
+    .attr("width", w)
+    .attr("height", h);
+
+var format = d3.time.format("%d/%m/%Y %H:%M:%S");
+
+var a=[];
+var d;
+var stepCreatedOn=[];
+
+d3.csv("IdeaManagerDSJS.csv", function(rows) {
+  a = rows;
+  stepCreatedOn = a.map(function(e) { return [ e["Idea Text"], format.parse(e["Timestamp Idea Created"])] })
+  d3.select("#step-Created-On").selectAll("li")
+      .data(stepCreatedOn)
+    .enter().append("li")
+      .text(function(d) { return d[0] })
+})
+
+
+  
+
+    </script>
+  </body>
+</html>
