@@ -31,10 +31,19 @@ function parseDateString(datestr) {
 }
 
 function renderListOfIdeas() {
-  d3.select("#step-Created-On").selectAll("li")
+  var dl = d3.select("body").append("div").selectAll("dl")
       .data(stepCreatedOn)
-    .enter().append("li")
-      .text(function(d) { return d[0] })
+    .enter().append("dl")
+    
+  var dt = dl.selectAll("dt")
+      .data(function(d) { return [d]; })
+    .enter().append("dt")
+      .text(function(d) { return d.date })
+  
+  var dd = dl.selectAll("dd")
+      .data(function(d) { return [d]; })
+    .enter().append("dd")
+      .text(function(d) { return d.idea })
 }
 
 // import the CSV data
