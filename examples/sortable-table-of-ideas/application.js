@@ -107,15 +107,25 @@ function sortTable(property) {
 
     default:
       table_data.sort(function(a, b) { 
-        if (b[property] === a[property]) {
+        var lowercase_a = stripSpacesAndConvertToLowerCase(a[property]),
+            lowercase_b = stripSpacesAndConvertToLowerCase(b[property]);
+        if (lowercase_a === lowercase_b) {
           return 0
         } else {
-          return b[property] > a[property]
+          if (lowercase_a > lowercase_b) {
+            return 1
+          } else {
+            return -1
+          }
         }
       });
       break;
   }
   redrawTableOfIdeas(); 
+}
+
+function stripSpacesAndConvertToLowerCase(str) {
+  return str.toLowerCase().replace(/(^\s+|\s+$)/g, '')
 }
 
 // import the CSV data
