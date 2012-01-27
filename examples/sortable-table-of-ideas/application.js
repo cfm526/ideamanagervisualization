@@ -98,11 +98,11 @@ function redrawTableOfIdeas() {
 function sortTable(property) {
   switch(column_types[property]) {
     case "Date":
-      table_data.sort(function(a, b) { return b[property] - a[property]});
+      table_data.sort(function(a, b) { return a[property] - b[property]});
       break;
     
     case "Number":
-      table_data.sort(function(a, b) { return b[property] - a[property]});
+      table_data.sort(function(a, b) { return a[property] - b[property]});
       break;
 
     default:
