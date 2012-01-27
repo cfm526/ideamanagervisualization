@@ -11,12 +11,12 @@ Enable JavaScript access to your local file system:
 
 1. enter `about:config` into the url bar of the browser.
 
-2. Enter `origin` in the search field named ** Filter**.
+2. Enter `origin` in the search field named **Filter**.
 
 3. Change `security.fileuri.strict_origin_policy` to false
 
 Install the [Web Developer](http://chrispederick.com/work/web-developer/) add-on and restart FireFox.
 
- Disable caching while developing:
+To disable caching while developing:
 
-1) Enable **Tools::Web Developer::Disable::Disable Cache**
+- Enable **Tools::Web Developer::Disable::Disable Cache**
