@@ -13,13 +13,18 @@ var date1_formatter = d3.time.format("%d/%m/%Y %H:%M:%S"),
     
 var parsed_csv_data = [],
     table_data = [],
+    workgroup_data = [],
+    selected_data = [],
     column_titles = [],
     column_types = {},
-    first_date, last_date, xdomain;
+    first_date, last_date, xdomain,
+    ydomain, yextent;
     
 var table, th, tbody, tr, td,
     chart, svg, tooltip, tooltip_content,
     idea_circle, idea_dragged;
+
+var workgroup_selector = document.getElementById("workgroup-selector");
 
 //
 // Right now we need to create two different date format parsing functions
@@ -33,21 +38,29 @@ var table, th, tbody, tr, td,
     
 function processCSVRows(rows) {
   parsed_csv_data = rows;
+  ydomain = [0, 5];
+  yextent = ydomain[1] - ydomain[0];
+  yScale.domain(ydomain);
   table_data = parsed_csv_data.map(function(e) { 
     return { 
       date: parseDateString(e["Timestamp Idea Created"]), 
       idea: e["Idea Text"],
-      y: Math.random()*5
+      workgroup: +e["Workgroup Id"],
+      y: Math.random() * yextent * 0.9 + yextent * 0.05
     } 
   });
+  workgroup_data = d3.nest().key(function(d) { return d.workgroup }).sortKeys(d3.ascending).entries(table_data)
+  workgroup_data.unshift({ 
+    key: "All " + workgroup_data.length + " Workgroups", 
+    values: table_data 
+  });
+  selected_data = table_data;
   column_types = columnTypes(table_data[0]);
   column_titles = rowProperties(table_data[0]);
   first_date = d3.min(table_data, function(d) { return d.date });
   last_date = d3.max(table_data, function(d) { return d.date });
   xdomain = [first_date, last_date];
   xScale.domain(xdomain);
-  ydomain = [0, 5];
-  yScale.domain(ydomain);
   generateChartOfIdeas();
 }
 
@@ -87,6 +100,7 @@ function columnTypes(row) {
 
 function generateChartOfIdeas() {
   createChartOfIdeas();
+  redrawChartOfIdeas();
 }
 
 function createChartOfIdeas() {
@@ -98,6 +112,20 @@ function createChartOfIdeas() {
   
   tooltip_content = tooltip.append("p")
   
+  workgroup_selector.onchange = function() {
+    selected_data = workgroup_data.filter(function(o) { 
+      return o.key == workgroup_selector.value 
+    })[0].values;
+    redrawChartOfIdeas();
+  };
+
+  d3.select(workgroup_selector).selectAll("option")
+      .data(workgroup_data, function(d) { return d })
+    .enter().append("option")
+        .attr("value", function(d, i) { return workgroup_data[i].key })
+        .text(function(d, i) { return workgroup_data[i].key });
+
+
   // Add an SVG element with the desired dimensions and margin.
   svg = chart.append("svg")
             .attr("width",  width + margin[1] + margin[3])
@@ -125,9 +153,15 @@ function createChartOfIdeas() {
       .attr("transform", "translate(" + width + ",0)")
       .call(yAxis);
 
+}
+
+function redrawChartOfIdeas() {
+  svg.selectAll("circle").remove();
+
   // add the data
   idea_circle = svg.append("svg:g").selectAll("circle")
-      .data(table_data, function(d) { return d })
+      .data(selected_data, function(d) { 
+        return d })
 
   idea_circle.enter().append("circle")
         .attr("cx",    function(d) { return xScale(d.date); })

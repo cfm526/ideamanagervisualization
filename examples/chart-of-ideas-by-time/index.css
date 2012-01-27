@@ -79,3 +79,8 @@ div.tooltip {
   border: solid 1px #aaaaaa;
   border-radius: 8px;
   pointer-events: none; }
+
+fieldset {
+  height: 2.2em;
+  width: 200px;
+  border: 0px; }
