@@ -20,7 +20,7 @@ var date1_formatter = d3.time.format("%d/%m/%Y %H:%M:%S"),
 function processCSVRows(rows) {
   parsed_csv_data = rows;
   table_data = parsed_csv_data.map(function(e) { 
-    return { idea: e["Idea Text"], date: parseDateString(e["Timestamp Idea Created"]) } 
+    return { date: parseDateString(e["Timestamp Idea Created"]), idea: e["Idea Text"] } 
   });
   column_types = columnTypes(table_data[0]);
   column_titles = rowProperties(table_data[0]);
