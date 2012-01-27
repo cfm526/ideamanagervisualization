@@ -1,0 +1,81 @@
+table {
+  font: 10px/24px Verdana, Arial, Helvetica, sans-serif;
+  border-collapse: collapse; 
+}
+
+th {
+  padding: 0em 1em;
+  text-align: center; 
+}
+
+td {
+  border-top: 1px solid #cccccc;
+  padding: 0em 1.5em 0em 0.5em;
+  text-align: left;
+  max-width: 50em;
+  word-wrap: break-word;
+}
+
+svg {
+  font-size: 10px;
+}
+
+rect {
+  fill: #eeeeee;
+}
+
+path.area {
+  fill: #000;
+  fill-opacity: .75;
+}
+
+.axis line, .grid line {
+  stroke-width: .5px;
+  shape-rendering: crispEdges;
+}
+
+.grid line {
+  stroke: #fff;
+}
+
+.grid line.minor {
+  stroke-opacity: .5;
+}
+
+.grid text {
+  display: none;
+}
+
+.axis line {
+  stroke: #000;
+}
+
+.grid path, .axis path {
+  display: none;
+}
+
+circle, .line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px; }
+
+circle {
+  fill: white;
+  fill-opacity: 0.2;
+  cursor: move; }
+  circle.selected {
+    fill: #ff7f0e;
+    stroke: #ff7f0e; }
+  circle:hover {
+    stroke: #ff7f0e; }
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 120px;
+  padding: 4px 8px;
+  font: 10px sans-serif;
+  background: #FFF1CD;
+  border: solid 1px #aaaaaa;
+  border-radius: 8px;
+  pointer-events: none; }
