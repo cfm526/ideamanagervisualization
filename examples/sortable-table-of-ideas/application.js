@@ -20,7 +20,7 @@ var date1_formatter = d3.time.format("%d/%m/%Y %H:%M:%S"),
 function processCSVRows(rows) {
   parsed_csv_data = rows;
   table_data = parsed_csv_data.map(function(e) { 
-    return { idea: e["Idea Text"], date: parseDateString(e["Timestamp Idea Created"]) } 
+    return { date: parseDateString(e["Timestamp Idea Created"]), idea: e["Idea Text"] } 
   });
   column_types = columnTypes(table_data[0]);
   column_titles = rowProperties(table_data[0]);
@@ -98,24 +98,34 @@ function redrawTableOfIdeas() {
 function sortTable(property) {
   switch(column_types[property]) {
     case "Date":
-      table_data.sort(function(a, b) { return b[property] - a[property]});
+      table_data.sort(function(a, b) { return a[property] - b[property]});
       break;
     
     case "Number":
-      table_data.sort(function(a, b) { return b[property] - a[property]});
+      table_data.sort(function(a, b) { return a[property] - b[property]});
       break;
 
     default:
       table_data.sort(function(a, b) { 
-        if (b[property] === a[property]) {
+        var lowercase_a = stripSpacesAndConvertToLowerCase(a[property]),
+            lowercase_b = stripSpacesAndConvertToLowerCase(b[property]);
+        if (lowercase_a === lowercase_b) {
           return 0
         } else {
-          return b[property] > a[property]
+          if (lowercase_a > lowercase_b) {
+            return 1
+          } else {
+            return -1
+          }
         }
       });
       break;
   }
   redrawTableOfIdeas(); 
+}
+
+function stripSpacesAndConvertToLowerCase(str) {
+  return str.toLowerCase().replace(/(^\s+|\s+$)/g, '')
 }
 
 // import the CSV data
