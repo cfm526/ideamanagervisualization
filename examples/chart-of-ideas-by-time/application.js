@@ -231,6 +231,7 @@ function redrawChartOfIdeas() {
 
 function ideaMouseOver(d) {
   showIdeaToolTip(d);
+  highlightSelectedWorkgroup(d.workgroup);
 }
 
 function ideaMouseDown(d) {
@@ -260,6 +261,9 @@ function hideIDeaToolTip() {
   tooltip.style("opacity", 1e-6);
 }
 
+function highlightSelectedWorkgroup(workgroup) {
+  idea_circle.classed("selected", function(d) { 
+    return d.workgroup == workgroup; });
 }
 
 function stripSpaces(str) {
