@@ -1,12 +1,12 @@
-var margin = [20, 20, 20, 20],
+var margin = [20, 60, 40, 20],
     width = 960 - margin[1] - margin[3],
     height = 500 - margin[0] - margin[2];
 
 var xScale = d3.time.scale().range([0, width]),
     yScale = d3.scale.linear().range([height, 0]),
-    xAxis = d3.svg.axis().scale(xScale).tickSubdivide(true),
-    yAxis = d3.svg.axis().scale(yScale).ticks(4).orient("right");
-    
+    xAxis = d3.svg.axis().scale(xScale),
+    yAxis = d3.svg.axis().scale(yScale),
+    xdomain, ydomain;
     
 var date1_input_formatter = d3.time.format("%d/%m/%Y %H:%M:%S"),
     date2_input_formatter = d3.time.format("%b %e, %Y %I:%M:%S %p"),
@@ -29,9 +29,7 @@ var parsed_csv_data = [],
     workgroup_data = [],
     selected_data = [],
     column_titles = [],
-    column_types = {},
-    first_date, last_date, xdomain,
-    ydomain, yextent;
+    column_types = {};
     
 var table, th, tbody, tr, td,
     chart, svg, tooltip, tooltip_content,
@@ -41,9 +39,6 @@ var workgroup_selector = document.getElementById("workgroup-selector");
 
 function processCSVRows(rows) {
   parsed_csv_data = rows;
-  ydomain = [0, 5];
-  yextent = ydomain[1] - ydomain[0];
-  yScale.domain(ydomain);
   table_data = parsed_csv_data.map(function(e) { 
     var date = parseDateString(e["Timestamp Idea Created"])
     return { 
@@ -61,10 +56,6 @@ function processCSVRows(rows) {
   selected_data = table_data;
   column_types = columnTypes(table_data[0]);
   column_titles = rowProperties(table_data[0]);
-  first_date = d3.min(table_data, function(d) { return d.date });
-  last_date = d3.max(table_data, function(d) { return d.date });
-  xdomain = [first_date, last_date];
-  xScale.domain(xdomain);
   generateChartOfIdeas();
 }
 
@@ -120,6 +111,7 @@ function createChartOfIdeas() {
     selected_data = workgroup_data.filter(function(o) { 
       return o.key == workgroup_selector.value 
     })[0].values;
+    redrawAxes();
     redrawChartOfIdeas();
   };
 
@@ -146,17 +138,67 @@ function createChartOfIdeas() {
      .attr("height", height);
        
   // Add the x-axis.
+  setupXAxis();
   svg.append("svg:g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
 
   // Add the y-axis.
+  setupYAxis();
   svg.append("svg:g")
       .attr("class", "y axis")
       .attr("transform", "translate(" + width + ",0)")
       .call(yAxis);
+}
 
+function redrawAxes() {
+  redrawXAxis();
+  redrawYAxis()
+}
+
+function redrawXAxis() {
+  setupXAxis();
+  svg.select("g.x").call(xAxis);
+}
+
+var xScale = d3.time.scale().range([0, width]),
+    yScale = d3.scale.linear().range([height, 0]),
+    xAxis = d3.svg.axis().scale(xScale).tickSubdivide(true),
+    yAxis = d3.svg.axis().scale(yScale).ticks(4).orient("right");
+
+
+function setupXAxis() {
+  xdomain = d3.extent(selected_data, function(d) { return d.date });
+  xScale.domain(xdomain);
+  xAxis.scale(xScale)
+}
+
+function redrawYAxis() {
+  setupYAxis();
+  svg.select("g.y").call(yAxis);      
+}
+
+function setupYAxis() {
+  ydomain = d3.extent(selected_data, function(d) { return d.time });
+  yScale.domain(ydomain).nice();
+  yAxis.scale(yScale)
+    .orient("right")
+    .tickFormat(yTickTimeOfDayFormatter);
+}
+
+var two_digit_formatter = d3.format("02.0f");
+
+function yTickTimeOfDayFormatter(decimal_hours) {
+  var hours   = Math.floor(decimal_hours);
+  var decimal_minutes = 60 * (decimal_hours - hours);
+  var minutes = Math.floor(decimal_minutes);
+  var decimal_seconds = 60 * (decimal_minutes - minutes);
+  var seconds = Math.floor(decimal_seconds);
+  var result = two_digit_formatter(hours) + ':' +
+               two_digit_formatter(minutes) + ':' +
+               two_digit_formatter(seconds);
+  return result
 }
 
 function redrawChartOfIdeas() {
@@ -169,7 +211,7 @@ function redrawChartOfIdeas() {
 
   idea_circle.enter().append("circle")
         .attr("cx",    function(d) { return xScale(d.date); })
-        .attr("cy",    function(d) { return yScale(d.y); })
+        .attr("cy",    function(d) { return yScale(d.time); })
         .attr("r", 6.0)
         .on("mousedown", function(d) { 
           ideaMouseDown(d) 
