@@ -129,5 +129,5 @@ function stripSpacesAndConvertToLowerCase(str) {
 }
 
 // import the CSV data
-d3.csv("../../IdeaManagerDSJS.csv", processCSVRows)
+d3.csv("../../data-exports/IdeaManagerDSJS.csv", processCSVRows)
 

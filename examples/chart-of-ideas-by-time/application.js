@@ -245,5 +245,5 @@ function stripSpaces(str) {
 // representation in the variable: table_data which is used to create 
 // the visualization.
 //
-d3.csv("../../IdeaManagerDSJS.csv", processCSVRows)
+d3.csv("../../data-exports/IdeaManagerDSJS.csv", processCSVRows)s
 
