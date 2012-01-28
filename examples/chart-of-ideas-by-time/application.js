@@ -29,13 +29,18 @@ var parsed_csv_data = [],
     workgroup_data = [],
     selected_data = [],
     column_titles = [],
-    column_types = {};
+    column_types = {},
+    all_workgroups_key, current_workgroup_key;
     
 var table, th, tbody, tr, td,
     chart, svg, tooltip, tooltip_content,
     idea_circle, idea_dragged;
 
 var workgroup_selector = document.getElementById("workgroup-selector");
+
+workgroup_selector.onchange = function() {
+  updateSelectedData(workgroup_selector.value);
+};
 
 function processCSVRows(rows) {
   parsed_csv_data = rows;
@@ -48,9 +53,11 @@ function processCSVRows(rows) {
       time: (date - d3.time.day(date)) / day2ms * 24
     } 
   });
-  workgroup_data = d3.nest().key(function(d) { return d.workgroup }).sortKeys(d3.ascending).entries(table_data)
+  workgroup_data = d3.nest().key(function(d) { return d.workgroup }).sortKeys(d3.ascending).entries(table_data);
+  all_workgroups_key = "All " + workgroup_data.length + " Workgroups";
+  current_workgroup_key = all_workgroups_key;
   workgroup_data.unshift({ 
-    key: "All " + workgroup_data.length + " Workgroups", 
+    key: all_workgroups_key, 
     values: table_data 
   });
   selected_data = table_data;
@@ -106,14 +113,6 @@ function createChartOfIdeas() {
       .style("opacity", 1e-6);
   
   tooltip_content = tooltip.append("p")
-  
-  workgroup_selector.onchange = function() {
-    selected_data = workgroup_data.filter(function(o) { 
-      return o.key == workgroup_selector.value 
-    })[0].values;
-    redrawAxes();
-    redrawChartOfIdeas();
-  };
 
   d3.select(workgroup_selector).selectAll("option")
       .data(workgroup_data, function(d) { return d })
@@ -151,6 +150,17 @@ function createChartOfIdeas() {
       .attr("transform", "translate(" + width + ",0)")
       .call(yAxis);
 }
+
+function updateSelectedData(workgroup_key) {
+  if (workgroup_key != current_workgroup_key) {
+    current_workgroup_key = workgroup_key;
+    selected_data = workgroup_data.filter(function(o) { 
+      return o.key == workgroup_key 
+    })[0].values;
+    redrawAxes();
+    redrawChartOfIdeas();
+  }
+};
 
 function redrawAxes() {
   redrawXAxis();
@@ -202,6 +212,7 @@ function yTickTimeOfDayFormatter(decimal_hours) {
 }
 
 function redrawChartOfIdeas() {
+  hideIDeaToolTip();
   svg.selectAll("circle").remove();
 
   // add the data
@@ -213,25 +224,42 @@ function redrawChartOfIdeas() {
         .attr("cx",    function(d) { return xScale(d.date); })
         .attr("cy",    function(d) { return yScale(d.time); })
         .attr("r", 6.0)
-        .on("mousedown", function(d) { 
-          ideaMouseDown(d) 
-          })
-        .on("mouseout",  function(d) { ideaMouseOut(d) });   
+        .on("mouseover", function(d) { ideaMouseOver(d) })
+        .on("mousedown", function(d) { ideaMouseDown(d) })
+        .on("mouseout",  function(d) { ideaMouseOut(d)  });   
+}
+
+function ideaMouseOver(d) {
+  showIdeaToolTip(d);
 }
 
 function ideaMouseDown(d) {
+  if (d3.event.altKey) {
+    updateSelectedData(all_workgroups_key)
+  } else {
+    updateSelectedData(d.workgroup)
+  }
+}
+
+function ideaMouseMove(d) {
+}
+
+function ideaMouseOut() {
+  hideIDeaToolTip();
+}
+
+function showIdeaToolTip(d) {
   tooltip.style("opacity", 1)
          .style("left", (d3.event.pageX + 6) + "px")
          .style("top", (d3.event.pageY - 30) + "px")
          .transition().duration(250);
-  tooltip_content.text(date_output_formatter(d.date) + ': '+ stripSpaces(d.idea));
+  tooltip_content.text(date_output_formatter(d.date) + ': '+ stripSpaces(d.idea));  
 }
 
-function ideaMouseMOve(d) {
-}
-
-function ideaMouseOut() {
+function hideIDeaToolTip() {
   tooltip.style("opacity", 1e-6);
+}
+
 }
 
 function stripSpaces(str) {
