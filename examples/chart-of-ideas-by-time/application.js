@@ -238,6 +238,12 @@ function stripSpaces(str) {
   return str.replace(/(^\s+|\s+$)/g, '')
 }
 
-// import the CSV data
+//
+// Start the application by importing the CSV data. When the import is 
+// complete the the imported data are passed to the callback function: 
+// processCSVRows(rows) to generate a selected and more structured data 
+// representation in the variable: table_data which is used to create 
+// the visualization.
+//
 d3.csv("../../IdeaManagerDSJS.csv", processCSVRows)
 
