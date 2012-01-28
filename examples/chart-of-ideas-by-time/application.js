@@ -7,10 +7,23 @@ var xScale = d3.time.scale().range([0, width]),
     xAxis = d3.svg.axis().scale(xScale).tickSubdivide(true),
     yAxis = d3.svg.axis().scale(yScale).ticks(4).orient("right");
     
-var date1_formatter = d3.time.format("%d/%m/%Y %H:%M:%S"),
-    date2_formatter = d3.time.format("%b %e, %Y %I:%M:%S %p"),
-    date_output_formatter = d3.time.format("%a %H:%M %Y-%m-%d");
     
+var date1_input_formatter = d3.time.format("%d/%m/%Y %H:%M:%S"),
+    date2_input_formatter = d3.time.format("%b %e, %Y %I:%M:%S %p"),
+    date_output_formatter = d3.time.format("%a %H:%M:%S %Y-%m-%d"),
+    date_24H_output_formatter = d3.time.format("%H:%M %Y-%m-%d"),
+    day2ms = 86400000;
+
+//
+// Right now we need to create two different date format parsing functions
+// because there are two different formats in the CSV data
+//
+// d3.time.format("%d/%m/%Y %H:%M:%S").parse("5/13/2011 12:25:36")
+// => Wed Jan 05 2011 12:25:36 GMT-0500 (EST)
+// d3.time.format("%b %e, %Y %I:%M:%S %p").parse("May 19, 2011 1:40:38 PM")
+// => Thu May 19 2011 13:40:38 GMT-0400 (EDT) 
+//
+ 
 var parsed_csv_data = [],
     table_data = [],
     workgroup_data = [],
@@ -26,16 +39,6 @@ var table, th, tbody, tr, td,
 
 var workgroup_selector = document.getElementById("workgroup-selector");
 
-//
-// Right now we need to create two different date format parsing functions
-// because there are two different formats in the CSV data
-//
-// d3.time.format("%d/%m/%Y %H:%M:%S").parse("5/13/2011 12:25:36")
-// => Wed Jan 05 2011 12:25:36 GMT-0500 (EST)
-// d3.time.format("%b %e, %Y %I:%M:%S %p").parse("May 19, 2011 1:40:38 PM")
-// => Thu May 19 2011 13:40:38 GMT-0400 (EDT) 
-//
-    
 function processCSVRows(rows) {
   parsed_csv_data = rows;
   ydomain = [0, 5];
@@ -66,7 +69,7 @@ function processCSVRows(rows) {
 
 function parseDateString(datestr) {
   var d;
-  d = date1_formatter.parse(datestr) || date2_formatter.parse(datestr);;
+  d = date1_input_formatter.parse(datestr) || date2_input_formatter.parse(datestr);;
   if (d) {
     return d
   } else {
