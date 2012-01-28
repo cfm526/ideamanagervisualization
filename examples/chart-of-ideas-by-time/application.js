@@ -45,11 +45,12 @@ function processCSVRows(rows) {
   yextent = ydomain[1] - ydomain[0];
   yScale.domain(ydomain);
   table_data = parsed_csv_data.map(function(e) { 
+    var date = parseDateString(e["Timestamp Idea Created"])
     return { 
-      date: parseDateString(e["Timestamp Idea Created"]), 
+      date: date, 
       idea: e["Idea Text"],
       workgroup: +e["Workgroup Id"],
-      y: Math.random() * yextent * 0.9 + yextent * 0.05
+      time: (date - d3.time.day(date)) / day2ms * 24
     } 
   });
   workgroup_data = d3.nest().key(function(d) { return d.workgroup }).sortKeys(d3.ascending).entries(table_data)
