@@ -133,11 +133,7 @@ function createChartOfIdeas() {
 
   svg.append("svg:rect")
      .attr("width", width)
-     .attr("height", height)
-     .on("mousedown", function() { 
-       hideIDeaToolTip();
-       idea_circle.classed("selected", false);
-     });
+     .attr("height", height);
        
   // Add the x-axis.
   setupXAxis();
@@ -152,6 +148,17 @@ function createChartOfIdeas() {
       .attr("class", "y axis")
       .attr("transform", "translate(" + width + ",0)")
       .call(yAxis);
+
+  // Attach a mousedown handler to the body of the document
+  // so that any mousedown NOT on something else will erase any
+  // displayed tooltips an un-highlight any selected idea circles.
+  d3.select("body")
+    .on("mousedown", function() { 
+      hideIDeaToolTip();
+      idea_circle.classed("selected", false);
+    });
+  
+
 }
 
 function updateSelectedDataAndRedraw(workgroup_key) {
