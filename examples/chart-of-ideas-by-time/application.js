@@ -157,7 +157,7 @@ function createChartOfIdeas() {
   // displayed tooltips an un-highlight any selected idea circles.
   d3.select("body")
     .on("mousedown", function() { 
-      hideIDeaToolTip();
+      hideIdeaToolTip();
       idea_circle.classed("selected", false);
     });
 }
@@ -232,7 +232,7 @@ function yTickTimeOfDayFormatter(decimal_hours) {
 }
 
 function redrawChartOfIdeas() {
-  hideIDeaToolTip();
+  hideIdeaToolTip();
   svg.selectAll("circle").remove();
 
   // add the data
@@ -268,7 +268,7 @@ function ideaMouseMove(d) {
 }
 
 function ideaMouseOut(d) {
-  // hideIDeaToolTip();
+  // hideIdeaToolTip();
   // removeHighlightFromSelectedWorkgroup(d.workgroup)
 }
 
@@ -296,9 +296,9 @@ function showIdeaToolTip(d) {
          .transition().duration(250);
 }
 
-function hideIDeaToolTip() {
+function hideIdeaToolTip() {
   tooltip.style("opacity", 1e-6);
-  tooltip_content.selectAll("ul").remove();
+  tooltip_content.selectAll("*").remove();
 }
 
 function highlightSelectedWorkgroup(workgroup) {
