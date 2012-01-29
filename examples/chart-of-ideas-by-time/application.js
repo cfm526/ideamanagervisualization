@@ -39,7 +39,7 @@ var table, th, tbody, tr, td,
 var workgroup_selector = document.getElementById("workgroup-selector");
 
 workgroup_selector.onchange = function() {
-  updateSelectedData(workgroup_selector.value);
+  updateSelectedDataAndRedraw(workgroup_selector.value);
 };
 
 function processCSVRows(rows) {
@@ -111,7 +111,7 @@ function createChartOfIdeas() {
       .attr("class", "tooltip")
       .style("opacity", 1e-6);
   
-  tooltip_content = tooltip.append("p")
+  tooltip_content = tooltip.append("div")
 
   d3.select(workgroup_selector).selectAll("option")
       .data(workgroup_data, function(d) { return d })
@@ -133,7 +133,11 @@ function createChartOfIdeas() {
 
   svg.append("svg:rect")
      .attr("width", width)
-     .attr("height", height);
+     .attr("height", height)
+     .on("mousedown", function() { 
+       hideIDeaToolTip();
+       idea_circle.classed("selected", false);
+     });
        
   // Add the x-axis.
   setupXAxis();
@@ -232,6 +236,7 @@ function redrawChartOfIdeas() {
         return d })
 
   idea_circle.enter().append("circle")
+        .attr("class", "idea")
         .attr("cx",    function(d) { return xScale(d.date); })
         .attr("cy",    function(d) { return yScale(d.time); })
         .attr("r", 6.0)
@@ -247,17 +252,20 @@ function ideaMouseOver(d) {
 
 function ideaMouseDown(d) {
   if (d3.event.altKey) {
-    updateSelectedData(all_workgroups_key)
+    updateSelectedDataAndRedraw(all_workgroups_key)
   } else {
-    updateSelectedData(d.workgroup)
-  }
+    updateSelectedDataAndRedraw(d.workgroup)
+  };
+  d3.event.preventDefault();
+  d3.event.stopPropagation();
 }
 
 function ideaMouseMove(d) {
 }
 
-function ideaMouseOut() {
-  hideIDeaToolTip();
+function ideaMouseOut(d) {
+  // hideIDeaToolTip();
+  // removeHighlightFromSelectedWorkgroup(d.workgroup)
 }
 
 function showIdeaToolTip(d) {
@@ -265,16 +273,34 @@ function showIdeaToolTip(d) {
          .style("left", (d3.event.pageX + 6) + "px")
          .style("top", (d3.event.pageY - 30) + "px")
          .transition().duration(250);
-  tooltip_content.text(date_output_formatter(d.date) + ': '+ stripSpaces(d.idea));  
+
+  tooltip_content.selectAll("*").remove();
+
+  tooltip_content.append("div")
+      .attr("class", "title")
+      .text("Workgroup: " + d.workgroup);
+
+  tooltip_content.selectAll("ul")
+      .data(filterWorkgroupData(d.workgroup))
+    .enter().append("ul")
+        .attr("class", function(i) { return (i.date == d.date) ? "selected" : ""; })
+        .append("li").text(function(i) { return date_output_formatter(i.date) })
+        .append("li").text(function(i) { return stripSpaces(i.idea) });
 }
 
 function hideIDeaToolTip() {
   tooltip.style("opacity", 1e-6);
+  tooltip_content.selectAll("ul").remove();
 }
 
 function highlightSelectedWorkgroup(workgroup) {
   idea_circle.classed("selected", function(d) { 
     return d.workgroup == workgroup; });
+}
+
+function removeHighlightFromSelectedWorkgroup(workgroup) {
+  // idea_circle.selectAll(classed("selected", function(d) { 
+  //   return d.workgroup == workgroup; });
 }
 
 function stripSpaces(str) {
