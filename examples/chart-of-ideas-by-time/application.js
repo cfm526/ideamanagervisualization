@@ -55,12 +55,11 @@ function processCSVRows(rows) {
   });
   workgroup_data = d3.nest().key(function(d) { return d.workgroup }).sortKeys(d3.ascending).entries(table_data);
   all_workgroups_key = "All " + workgroup_data.length + " Workgroups";
-  current_workgroup_key = all_workgroups_key;
   workgroup_data.unshift({ 
     key: all_workgroups_key, 
     values: table_data 
   });
-  selected_data = table_data;
+  updateSelectedData(all_workgroups_key);
   column_types = columnTypes(table_data[0]);
   column_titles = rowProperties(table_data[0]);
   generateChartOfIdeas();
@@ -151,17 +150,29 @@ function createChartOfIdeas() {
       .call(yAxis);
 }
 
-function updateSelectedData(workgroup_key) {
-  if (workgroup_key != current_workgroup_key) {
-    current_workgroup_key = workgroup_key;
-    selected_data = workgroup_data.filter(function(o) { 
-      return o.key == workgroup_key 
-    })[0].values;
+function updateSelectedDataAndRedraw(workgroup_key) {
+  if (updateSelectedData(workgroup_key)) {
     redrawAxes();
     redrawChartOfIdeas();
   }
 };
 
+function updateSelectedData(workgroup_key) {
+  if (workgroup_key != current_workgroup_key) {
+    current_workgroup_key = workgroup_key;
+    selected_data = filterWorkgroupData(workgroup_key);
+    return true
+  } else {
+    return false
+  }
+};
+
+function filterWorkgroupData(workgroup_key) {
+  var filter_data = workgroup_data.filter(function(o) { 
+    return o.key == workgroup_key 
+  });
+  return filter_data[0].values;
+}
 function redrawAxes() {
   redrawXAxis();
   redrawYAxis()
