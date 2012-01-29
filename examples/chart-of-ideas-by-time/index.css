@@ -73,8 +73,8 @@ div.tooltip {
   position: absolute;
   text-align: left;
   width: 240px;
-  margin: 2px;
-  padding: 2px 4px;
+  margin: 0px;
+  padding: 0.5em 0.5em 1em 0.5em;
   font: 10px sans-serif;
   background: #FFF1CD;
   border: solid 1px #aaaaaa;
@@ -82,20 +82,19 @@ div.tooltip {
   pointer-events: none; }
   div.tooltip .title {
     font-size 14px; 
-    font-weight: bold; }
+    font-weight: bold;
+    padding: 0.5em 0em 0em 0em; }
   div.tooltip ul.selected {
     font-weight: bold; }
   div.tooltip ul {
     list-style-type: none;
     margin: 0em 0em 0em 0em;
-    padding: 0em 0em 0em 0em; }
+    padding: 0.5em 0em 0em 0em; }
     div.tooltip ul li {
       line-height: 1em;
       display: inline-table;
       margin: 0em 0em 0em 0em;
-      padding: 0.5em 0em 0.5em 0em; }
-        
-  
+      padding: 0.2em 0em 0em 0em; }
 
 fieldset {
   height: 2.2em;

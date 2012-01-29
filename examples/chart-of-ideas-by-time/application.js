@@ -1,6 +1,7 @@
 var margin = [20, 60, 40, 20],
     width = 960 - margin[1] - margin[3],
-    height = 500 - margin[0] - margin[2];
+    height = 500 - margin[0] - margin[2],
+    top_of_chart, right_of_chart;
 
 var xScale = d3.time.scale().range([0, width]),
     yScale = d3.scale.linear().range([height, 0]),
@@ -106,6 +107,8 @@ function generateChartOfIdeas() {
 
 function createChartOfIdeas() {
   chart = d3.select("#chart");
+  top_of_chart =   chart[0][0].offsetTop  + chart[0][0].offsetHeight + margin[0];
+  right_of_chart = chart[0][0].offsetLeft + width + margin[1] + margin[3];
   
   tooltip = chart.append("div")
       .attr("class", "tooltip")
@@ -213,7 +216,7 @@ function redrawYAxis() {
 
 function setupYAxis() {
   ydomain = d3.extent(selected_data, function(d) { return d.time });
-  yScale.domain(ydomain).nice();
+  yScale.domain(ydomain);
   yAxis.scale(yScale)
     .orient("right")
     .tickFormat(yTickTimeOfDayFormatter);
@@ -276,10 +279,7 @@ function ideaMouseOut(d) {
 }
 
 function showIdeaToolTip(d) {
-  tooltip.style("opacity", 1)
-         .style("left", (d3.event.pageX + 6) + "px")
-         .style("top", (d3.event.pageY - 30) + "px")
-         .transition().duration(250);
+  var wg_data = filterWorkgroupData(d.workgroup);
 
   tooltip_content.selectAll("*").remove();
 
@@ -287,12 +287,21 @@ function showIdeaToolTip(d) {
       .attr("class", "title")
       .text("Workgroup: " + d.workgroup);
 
-  tooltip_content.selectAll("ul")
-      .data(filterWorkgroupData(d.workgroup))
+  var tooltip_ul = tooltip_content.selectAll("ul")
+      .data(wg_data)
     .enter().append("ul")
-        .attr("class", function(i) { return (i.date == d.date) ? "selected" : ""; })
-        .append("li").text(function(i) { return date_output_formatter(i.date) })
-        .append("li").text(function(i) { return stripSpaces(i.idea) });
+      .attr("class", function(idea, i) { 
+        if (idea.date == d.date) { return "selected" } else { return "" }
+      }).selectAll("li")
+        .data(function(idea) { 
+          return [date_output_formatter(idea.date), stripSpaces(idea.idea)]; 
+        }).enter().append("li")
+        .text(function(item) { return item });
+
+  tooltip.style("opacity", 1)
+         .style("left", right_of_chart + 20 + "px")
+         .style("top",  top_of_chart + "px")
+         .transition().duration(250);
 }
 
 function hideIDeaToolTip() {
