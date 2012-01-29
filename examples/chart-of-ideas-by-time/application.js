@@ -160,8 +160,6 @@ function createChartOfIdeas() {
       hideIDeaToolTip();
       idea_circle.classed("selected", false);
     });
-  
-
 }
 
 function updateSelectedDataAndRedraw(workgroup_key) {
@@ -198,12 +196,6 @@ function redrawXAxis() {
   svg.select("g.x").call(xAxis);
 }
 
-var xScale = d3.time.scale().range([0, width]),
-    yScale = d3.scale.linear().range([height, 0]),
-    xAxis = d3.svg.axis().scale(xScale).tickSubdivide(true),
-    yAxis = d3.svg.axis().scale(yScale).ticks(4).orient("right");
-
-
 function setupXAxis() {
   xdomain = d3.extent(selected_data, function(d) { return d.date });
   xScale.domain(xdomain);
@@ -225,6 +217,8 @@ function setupYAxis() {
 
 var two_digit_formatter = d3.format("02.0f");
 
+// Convert a decimal 24H time of day and return as a
+// formatted string of HH:MM:SS
 function yTickTimeOfDayFormatter(decimal_hours) {
   var hours   = Math.floor(decimal_hours);
   var decimal_minutes = 60 * (decimal_hours - hours);
@@ -243,8 +237,7 @@ function redrawChartOfIdeas() {
 
   // add the data
   idea_circle = svg.append("svg:g").selectAll("circle")
-      .data(selected_data, function(d) { 
-        return d })
+      .data(selected_data, function(d) { return d })
 
   idea_circle.enter().append("circle")
         .attr("class", "idea")
@@ -280,16 +273,14 @@ function ideaMouseOut(d) {
 }
 
 function showIdeaToolTip(d) {
-  var wg_data = filterWorkgroupData(d.workgroup);
-
   tooltip_content.selectAll("*").remove();
 
   tooltip_content.append("div")
       .attr("class", "title")
       .text("Workgroup: " + d.workgroup);
 
-  var tooltip_ul = tooltip_content.selectAll("ul")
-      .data(wg_data)
+  tooltip_content.selectAll("ul")
+      .data(filterWorkgroupData(d.workgroup))
     .enter().append("ul")
       .attr("class", function(idea, i) { 
         if (idea.date == d.date) { return "selected" } else { return "" }
@@ -320,6 +311,7 @@ function removeHighlightFromSelectedWorkgroup(workgroup) {
   //   return d.workgroup == workgroup; });
 }
 
+// Strips leading and trailing spaces from a string and returns the result
 function stripSpaces(str) {
   return str.replace(/(^\s+|\s+$)/g, '')
 }
