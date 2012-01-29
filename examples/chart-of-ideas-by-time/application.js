@@ -175,6 +175,7 @@ function updateSelectedData(workgroup_key) {
   if (workgroup_key != current_workgroup_key) {
     current_workgroup_key = workgroup_key;
     selected_data = filterWorkgroupData(workgroup_key);
+    workgroup_selector.value = current_workgroup_key;
     return true
   } else {
     return false
