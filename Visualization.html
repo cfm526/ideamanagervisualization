@@ -29,7 +29,7 @@ var a=[];
 var d;
 var stepCreatedOn=[];
 
-d3.csv("IdeaManagerDSJS.csv", function(rows) {
+d3.csv("data-exports/IdeaManagerDSJS.csv", function(rows) {
   a = rows;
   stepCreatedOn = a.map(function(e) { return [ e["Idea Text"], format.parse(e["Timestamp Idea Created"])] })
   d3.select("#step-Created-On").selectAll("li")
